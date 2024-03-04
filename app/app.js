@@ -6,6 +6,7 @@ import userRouter from '../routes/usersRoutes.js';
 import productsRouter from '../routes/productsRoutes.js';
 import categoriesRouter from '../routes/categoriesRoutes.js';
 import brandsRouter from '../routes/brandsRoutes.js';
+import reviewRouter from '../routes/reviewRoutes.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use('/api/v1/users/', userRouter);
 app.use('/api/v1/products/', productsRouter);
 app.use('/api/v1/categories/', categoriesRouter);
 app.use('/api/v1/brands/', brandsRouter);
+app.use('/api/v1/reviews/', reviewRouter);
 
 //error middleware
 app.use(notFound);

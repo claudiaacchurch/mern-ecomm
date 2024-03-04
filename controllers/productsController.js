@@ -146,7 +146,8 @@ export const getProductsController = asyncHandler(async(req, res) => {
         }
     }
     //await means end the process,  no more queries to mongoose
-    const products = await productQuery;
+    // this is where we are awaiting the query, so this is where we populate reviews
+    const products = await productQuery.populate('reviews');
 
     res.json ({
         status: "success",
@@ -164,7 +165,7 @@ export const getProductsController = asyncHandler(async(req, res) => {
 
 export const getProductController = asyncHandler(async(req, res) => {
     //req.params = anything after :
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate('reviews');
     if(!product) {
         throw new Error("Product not found.");
     } 

@@ -69,6 +69,7 @@ const ProductSchema = new Schema(
   {
     timestamps: true,
     toJSON: { virtuals: true },
+    //populate IDS into real objects
   }
 );
 //Virtuals
