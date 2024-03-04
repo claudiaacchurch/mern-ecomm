@@ -8,7 +8,7 @@ import asyncHandler from "express-async-handler";
 //@access Private/Admin
 
 export const createProductsController = asyncHandler(async(req, res) => {
-    const {name, description, brand, category, sizes, colors, user, images, reviews, price, totalQty} 
+    const {name, description, brand, category, sizes, colors, user, images, reviews, price, totalQty, averageRating} 
     = req.body;
     //check logged in user is admin
     const productExists = await Product.findOne({name});
@@ -41,7 +41,7 @@ export const createProductsController = asyncHandler(async(req, res) => {
         images,
         reviews,
         price,
-        totalQty,
+        totalQty
     });
     
     //push product into category (products)
