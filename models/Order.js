@@ -44,6 +44,10 @@ const OrderSchema = new Schema(
       type: String,
       default: "Not specified",
     },
+    totalPrice: {
+      type: Number,
+      default: 0.0,
+    },
     //for admin to update order status
     status: {
       type: String,
