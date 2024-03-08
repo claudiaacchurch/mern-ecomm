@@ -1,70 +1,71 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
-const UserSchema = new Schema({
+const UserSchema = new Schema(
+  {
     fullname: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     email: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     password: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     orders: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Order',
-        },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order',
+      },
     ],
     wishlists: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'WishList',
-        },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'WishList',
+      },
     ],
     isAdmin: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
     hasShippingAddress: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
     shippingAddress: {
-        firstname: {
-            type: String,
-        },
-        lastname: {
-            type: String,
-        },
-        address: {
-            type: String,
-        },
-        city: {
-            type: String,
-        },
-        postcode: {
-            type: String,
-        },
-        country: {
-            type: String,
-        },
-        phone: {
-            type: String,
-        },
+      firstname: {
+        type: String,
+      },
+      lastname: {
+        type: String,
+      },
+      address: {
+        type: String,
+      },
+      city: {
+        type: String,
+      },
+      postcode: {
+        type: String,
+      },
+      country: {
+        type: String,
+      },
+      phone: {
+        type: String,
+      },
     },
-},
-{
-timestamps: true,
-}
+  },
+  {
+    timestamps: true,
+  },
 );
 
-//compile schema to model
+// compile schema to model
 const User = mongoose.model('User', UserSchema);
 
 export default User;

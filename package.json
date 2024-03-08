@@ -22,7 +22,8 @@
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.4.0",
-    "mongoose": "^8.0.3"
+    "mongoose": "^8.0.3",
+    "stripe": "^14.20.0"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
