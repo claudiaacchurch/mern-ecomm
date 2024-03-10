@@ -1,10 +1,11 @@
-import expressAsyncHandler from 'express-async-handler';
-// import dotenv from 'dotenv';
-// dotenv.config();
-import Stripe from 'stripe';
-import Order from '../models/Order.js';
-import User from '../models/User.js';
-import Product from '../models/Product.js';
+import expressAsyncHandler from "express-async-handler";
+//required to use .env stripe variable
+import dotenv from "dotenv";
+dotenv.config();
+import Stripe from "stripe";
+import Order from "../models/Order.js";
+import User from "../models/User.js";
+import Product from "../models/Product.js";
 
 // @desc create orders
 // @route POST api/v1/orders
@@ -18,14 +19,14 @@ export const createOrderController = expressAsyncHandler(async (req, res) => {
   const user = await User.findById(req.userAuthId);
   // Check if user has shipping address (for order)
   if (!user?.hasShippingAddress) {
-    throw new Error('Please provide your shipping address');
+    throw new Error("Please provide your shipping address");
   }
   // Get the payload(customer, orderItems, shippingAddress, totalPrice)
   // destructure body
   const { orderItems, shippingAddress, totalPrice } = req.body;
   // Check if order is not empty
   if (orderItems.length === 0) {
-    throw new Error('No order items.');
+    throw new Error("No order items.");
   }
   // Place order - save into DB
   const order = await Order.create({
@@ -41,7 +42,9 @@ export const createOrderController = expressAsyncHandler(async (req, res) => {
   // 1. find all products by id (mongoose terms)
   const products = await Product.find({ _id: { $in: orderItems } });
   orderItems?.map(async (item) => {
-    const product = products?.find((product) => product?._id.toString() === item?._id.toString());
+    const product = products?.find(
+      (product) => product?._id.toString() === item?._id.toString()
+    );
     if (product) {
       product.totalSold += item.totalQtyBuying;
       product.qtyLeft -= item.totalQtyBuying;
@@ -49,22 +52,27 @@ export const createOrderController = expressAsyncHandler(async (req, res) => {
     await product.save();
   });
   // Make payment (stripe)
-  const session = await stripe.checkout.sessions.create({
-    line_items: [{
+  //convert orderItems to have same structure as stripe
+  const convertedOrderItems = orderItems.map((item) => {
+    return {
       price_data: {
-        currency: 'usd',
+        currency: "gbp",
         product_data: {
-          name: 'Hats',
-          description: 'Best hat',
+          name: item?.name,
+          description: item?.description,
+          // image: item.image,
         },
-        unit_amount: 10 * 100,
+        unit_amount: item?.price * 100,
       },
-      quantity: 2,
-    }],
+      quantity: item?.totalQtyBuying,
+    };
+  });
+  const session = await stripe.checkout.sessions.create({
+    line_items: convertedOrderItems,
     // one time or subscription
-    mode: 'payment',
-    success_url: 'http://localhost:7000',
-    cancel_url: 'http://localhost:7000',
+    mode: "payment",
+    success_url: "http://localhost:7000/success",
+    cancel_url: "http://localhost:7000/failure",
   });
   // Payment webhook
   // Update user order
@@ -72,5 +80,3 @@ export const createOrderController = expressAsyncHandler(async (req, res) => {
   // send url to user
   res.redirect(303, session.url);
 });
-
-
