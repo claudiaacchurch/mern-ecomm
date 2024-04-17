@@ -17,7 +17,7 @@ dotenv.config();
 
 dbConnect();
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "http://localhost:8888/mernEcomm" }));
 // stripe webhook
 
 const stripe = new Stripe(process.env.STRIPE_KEY);
