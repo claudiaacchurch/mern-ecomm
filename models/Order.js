@@ -42,7 +42,7 @@ const OrderSchema = new Schema(
     },
     currency: {
       type: String,
-      default: "Not specified",
+      default: "GBP",
     },
     totalPrice: {
       type: Number,

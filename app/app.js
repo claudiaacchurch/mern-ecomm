@@ -9,12 +9,15 @@ import categoriesRouter from "../routes/categoriesRoutes.js";
 import brandsRouter from "../routes/brandsRoutes.js";
 import reviewRouter from "../routes/reviewRoutes.js";
 import orderRouter from "../routes/orderRoutes.js";
+import Order from "../models/Order.js";
+import cors from "cors";
+import typesRouter from "../routes/typesRoutes.js";
 
 dotenv.config();
 
 dbConnect();
 const app = express();
-
+app.use(cors());
 // stripe webhook
 
 const stripe = new Stripe(process.env.STRIPE_KEY);
@@ -23,7 +26,7 @@ const endpointSecret = process.env.WEBHOOK_ENDPNT;
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
-  (request, response) => {
+  async (request, response) => {
     let event = request.body;
     // Only verify the event if you have an endpoint secret defined.
     // Otherwise use the basic event deserialized with JSON.parse
@@ -42,8 +45,25 @@ app.post(
       }
     }
     if (event.type === "checkout.session.completed") {
-      //update order object with correct details
-      
+      //update order object with correct details (from order controller)
+      const session = event.data.object;
+      const { orderId } = session.metadata;
+      const paymentStatus = session.payment_status;
+      const paymentMethod = session.payment_method_types[0];
+      const totalAmount = session.amount_total;
+      const currency = session.currency;
+      //find order
+      const order = await Order.findByIdAndUpdate(
+        orderId,
+        {
+          totalPrice: totalAmount / 100,
+          currency,
+          paymentMethod,
+          paymentStatus,
+        },
+        { new: true }
+      );
+      order.save();
     } else {
       return;
     }
@@ -83,6 +103,7 @@ app.use("/api/v1/categories/", categoriesRouter);
 app.use("/api/v1/brands/", brandsRouter);
 app.use("/api/v1/reviews/", reviewRouter);
 app.use("/api/v1/orders/", orderRouter);
+app.use("/api/v1/types/", typesRouter);
 
 //error middleware
 app.use(notFound);

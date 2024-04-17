@@ -69,6 +69,10 @@ export const createOrderController = expressAsyncHandler(async (req, res) => {
   });
   const session = await stripe.checkout.sessions.create({
     line_items: convertedOrderItems,
+    metadata: {
+      //pass in order id to have in webhook
+      orderId: order?.id,
+    },
     // one time or subscription
     mode: "payment",
     success_url: "http://localhost:7000/success",
@@ -79,4 +83,49 @@ export const createOrderController = expressAsyncHandler(async (req, res) => {
   console.log(session);
   // send url to user
   res.redirect(303, session.url);
+});
+
+// @desc create orders
+// @route GET api/v1/orders
+// @access private
+
+export const getAllOrdersController = expressAsyncHandler(async (req, res) => {
+  const orders = await Order.find();
+  res.json({
+    success: true,
+    msg: "all orders",
+    orders,
+  });
+});
+
+// @desc get single order
+// @route GET api/v1/orders/:id
+// @access private
+
+export const getOrderController = expressAsyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  res.json({
+    success: true,
+    msg: "order",
+    order,
+  });
+});
+
+// @desc update order to delivered
+// @route PUT api/v1/orders/:id
+// @access private
+
+export const updateOrderController = expressAsyncHandler(async (req, res) => {
+  const order = await Order.findByIdAndUpdate(
+    req.params.id,
+    {
+      status: req.body.status,
+    },
+    { new: true }
+  );
+  res.status(200).json({
+    success: true,
+    msg: "order updated",
+    order,
+  });
 });
